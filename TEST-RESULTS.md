@@ -1,5 +1,20 @@
 # 验证记录
 
+## npm / Node.js 迁移验证（2026-11-02）
+
+环境：Node.js 26.12.1、npm 12.2.1、OpenCode 2.2.4。
+
+- 删除原 Bun 安装的 `node_modules` 和 `bun.lock`，通过 npm 重新安装并生成 `package-lock.json`；随后 `npm ci --no-audit --no-fund` 重建成功。
+- `npm run check`：类型检查通过，Node.js 内置测试运行器执行全部 46 项测试，46 通过、0 失败。
+- `npm ls @types/bun bun-types --all` 为空；npm 锁文件中也无这两个依赖。项目脚本不再调用 Bun。
+- 中文 Plan、日语 Build 各一次 DeepSeek 隔离验证通过：Thinking 与最终回答均使用目标语言，检测元数据正确，用户文本保持原样，无 API 错误。
+- Node.js 版 `scripts/review-live.ts` 成功读取并检查这两条真实测试记录。
+- 依赖目录由约 225 MB 变为 217 MB。系统 Bun 和共享缓存保留；临时测试文件、目录和进程已清理。
+
+本次只迁移依赖管理和开发工具；下方 24 次矩阵属于迁移前的历史验证，本次没有重新运行完整矩阵。
+
+## 迁移前验证环境
+
 时间：2026-11-01 至 2026-11-02（Asia/Singapore）。
 环境：OpenCode 2.2.4、Bun 1.4.4、DeepSeek `deepseek/deepseek-flash#max`。
 

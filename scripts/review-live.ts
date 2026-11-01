@@ -1,8 +1,9 @@
 // Diagnostic language classification; review flags manually, especially quotations.
+import { readFile } from "node:fs/promises"
 import { eld } from "eld/medium"
 const path = process.argv[2]
-if (!path) throw new Error("Usage: bun scripts/review-live.ts results.jsonl")
-for (const line of (await Bun.file(path).text()).trim().split("\n")) {
+if (!path) throw new Error("Usage: node scripts/review-live.ts results.jsonl")
+for (const line of (await readFile(path, "utf8")).trim().split("\n")) {
   const row = JSON.parse(line)
   const target = row.case.split("-")[0]
   const foreign = row.reasoning.split(/\n\s*\n/).flatMap((text: string, index: number) => {

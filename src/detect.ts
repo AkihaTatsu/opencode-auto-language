@@ -1,5 +1,5 @@
 import { eld } from "eld/medium"
-import templates from "./native-templates.json"
+import templates from "./native-templates.json" with { type: "json" }
 
 export interface Detection {
   language?: string

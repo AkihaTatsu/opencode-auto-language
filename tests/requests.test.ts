@@ -1,4 +1,5 @@
-import { expect, test } from "bun:test"
+import { test } from "node:test"
+import assert from "node:assert/strict"
 import { appendInstruction, compactionRequest } from "../src/requests.ts"
 
 test("only the outgoing user copy changes; tools, reasoning and signatures stay intact", () => {
@@ -9,17 +10,17 @@ test("only the outgoing user copy changes; tools, reasoning and signatures stay 
   ]
   const before = structuredClone(messages)
   const after = appendInstruction(messages, "zh")
-  expect(messages).toEqual(before)
-  expect(JSON.stringify(after[0])).toContain('language=\\"zh\\"')
-  expect(after.slice(1)).toEqual(messages.slice(1))
-  expect(appendInstruction(after, "zh")).toEqual(after)
+  assert.deepStrictEqual(messages, before)
+  assert.ok((JSON.stringify(after[0])).includes('language=\\"zh\\"'))
+  assert.deepStrictEqual(after.slice(1), messages.slice(1))
+  assert.deepStrictEqual(appendInstruction(after, "zh"), after)
 })
 
 test("native reminders receive the constraint without replacing the restriction", () => {
   const reminder = "Tools are disabled until next user input. Respond with text only."
   const after = appendInstruction([{ role: "user", content: reminder }], "ja")
-  expect(after[0]!.content).toStartWith(reminder)
-  expect(after[0]!.content).toContain("日本語")
+  assert.ok((after[0]!.content).startsWith(reminder))
+  assert.ok((after[0]!.content).includes("日本語"))
 })
 
 for (const format of ["chat", "anthropic", "responses"] as const) {
@@ -29,16 +30,16 @@ for (const format of ["chat", "anthropic", "responses"] as const) {
     const original = new Request("https://example.invalid/v1/messages", { method: "POST", headers: { "authorization": "test-secret", "content-type": "application/json" }, body: JSON.stringify(payload) })
     const modified = await compactionRequest(original, "ar")
     const result = await modified.json()
-    expect(await original.json()).toEqual(payload)
-    expect(result.temperature).toBe(0.2)
-    expect(modified.headers.get("authorization")).toBe("test-secret")
-    expect(JSON.stringify(result)).toContain("## Objective")
-    expect(JSON.stringify(result)).toContain("العربية")
-    if (format === "responses") expect(result.input[0].content.at(-1).type).toBe("input_text")
+    assert.deepStrictEqual(await original.json(), payload)
+    assert.strictEqual(result.temperature, 0.2)
+    assert.strictEqual(modified.headers.get("authorization"), "test-secret")
+    assert.ok((JSON.stringify(result)).includes("## Objective"))
+    assert.ok((JSON.stringify(result)).includes("العربية"))
+    if (format === "responses") assert.strictEqual(result.input[0].content.at(-1).type, "input_text")
   })
 }
 
 test("unknown compaction protocol reports an error", async () => {
   const request = new Request("https://example.invalid", { method: "POST", body: "{}" })
-  expect(compactionRequest(request, "zh")).rejects.toThrow("unsupported compaction")
+  await assert.rejects(compactionRequest(request, "zh"), /unsupported compaction/)
 })

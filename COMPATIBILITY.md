@@ -1,6 +1,6 @@
 # OpenCode 兼容与更新
 
-当前契约：OpenCode 2.2.4、`@opencode/plugin` 2.2.4、ELD 2.1.0、Bun 1.4.4。
+当前契约：OpenCode 2.2.4、`@opencode/plugin` 2.2.4、ELD 2.1.0、Node.js 26（本机验证 26.12.1）、npm 12.2.1。
 
 ## 依赖的接口
 
@@ -29,7 +29,7 @@
 
 1. 比较新版本插件类型及上述四个模板。同步 SDK 版本、模板和锁文件。
 2. 检查 native Plan 提醒、自动续接、标题、generate、compaction 的钩子顺序及消息形态。尤其确认摘要模板是否仍在 compaction 钩子之后追加。
-3. 运行 `bun run check`，再运行实际模型四语言矩阵及 `--extended`。
+3. 运行 `npm run check`，再运行实际模型四语言矩阵及 `--extended`。
 4. 确认固定 JSON 字段和摘要标题不变、保存的用户文本不含注入内容，然后更新测试报告与版本。
 
 验收门槛：中文 6/6；四语言合计至少 22/24；日语、阿拉伯语、英语各至少 5/6。Thinking 中出现连续其他语言叙述算失败；代码、标识符、必要引用和固定协议字段不计。没有输出 Thinking 的样本不能算推理语言通过。

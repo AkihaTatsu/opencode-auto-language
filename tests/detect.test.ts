@@ -1,6 +1,7 @@
-import { describe, expect, test } from "bun:test"
+import { describe, test } from "node:test"
+import assert from "node:assert/strict"
 import { detectInput, sourceText, supportedLanguages } from "../src/detect.ts"
-import templates from "../src/native-templates.json"
+import templates from "../src/native-templates.json" with { type: "json" }
 
 const samples: Record<string, string> = {
   zh: "请比较公园野餐和室内聚餐，分析优缺点并给出建议。",
@@ -15,25 +16,25 @@ const samples: Record<string, string> = {
 }
 
 describe("offline detection", () => {
-  test("uses the full detector inventory", () => expect(supportedLanguages.length).toBe(60))
+  test("uses the full detector inventory", () => assert.strictEqual(supportedLanguages.length, 60))
   for (const [language, text] of Object.entries(samples)) {
     test(language, () => {
-      expect(detectInput(text)).toMatchObject({ language, reliable: true, source: "user" })
+      assert.partialDeepStrictEqual(detectInput(text), { language, reliable: true, source: "user" })
     })
   }
   test("explicit interaction language overrides the request language", () => {
-    expect(detectInput("请使用法语进行思考和交流，简短比较公园野餐和在家聚餐。")).toMatchObject({ language: "fr", reliable: true })
-    expect(detectInput("请用法语写一封邮件，然后用中文解释措辞。")).toMatchObject({ language: "zh", reliable: true })
+    assert.partialDeepStrictEqual(detectInput("请使用法语进行思考和交流，简短比较公园野餐和在家聚餐。"), { language: "fr", reliable: true })
+    assert.partialDeepStrictEqual(detectInput("请用法语写一封邮件，然后用中文解释措辞。"), { language: "zh", reliable: true })
   })
   test("quoted CLI argument still detects the user's prose", () => {
-    expect(detectInput('"' + samples.zh + '"').language).toBe("zh")
+    assert.strictEqual(detectInput('"' + samples.zh + '"').language, "zh")
   })
   test("English fenced code and blockquotes do not outweigh Chinese instructions", () => {
     const text = `${samples.zh}\n\n> ${samples.en}\n> ${samples.en}\n\n\`\`\`ts\nconst option = "${samples.en}";\n\`\`\``
-    expect(detectInput(text)).toMatchObject({ language: "zh", reliable: true })
+    assert.partialDeepStrictEqual(detectInput(text), { language: "zh", reliable: true })
   })
   for (const text of ["继续", "OK!", "はい", "تابع", "```ts\nconst value = 1\n```", "const value = 1;", 'print("hello world")', "", "https://example.org/some/english/path"]) {
-    test(`no language switch: ${text}`, () => expect(detectInput(text).reliable).toBe(false))
+    test(`no language switch: ${text}`, () => assert.strictEqual(detectInput(text).reliable, false))
   }
 })
 
@@ -42,21 +43,21 @@ describe("native commands", () => {
     test(`${name}: extract arguments without counting the English template`, () => {
       const template = templates[name].replaceAll("${path}", "/tmp/example")
       const text = template.includes("$ARGUMENTS") ? template.replaceAll("$ARGUMENTS", samples.zh!) : `${template}\n\n${samples.zh}`
-      expect(sourceText(text)).toEqual({ text: samples.zh!, source: "command" })
-      expect(detectInput(text)).toMatchObject({ language: "zh", reliable: true })
+      assert.deepStrictEqual(sourceText(text), { text: samples.zh!, source: "command" })
+      assert.partialDeepStrictEqual(detectInput(text), { language: "zh", reliable: true })
     })
     test(`${name}: no arguments means inherit the session language`, () => {
       const text = templates[name].replaceAll("${path}", "/tmp/example").replaceAll("$ARGUMENTS", "")
-      expect(detectInput(text)).toMatchObject({ source: "command", reliable: false })
+      assert.partialDeepStrictEqual(detectInput(text), { source: "command", reliable: false })
     })
   }
   test("schedule extracts only the request", () => {
     const text = templates.schedule.replaceAll("$ARGUMENTS", "请在十分钟后提醒我检查实验结果。")
-    expect(detectInput(text)).toMatchObject({ source: "command", language: "zh", reliable: true })
+    assert.partialDeepStrictEqual(detectInput(text), { source: "command", language: "zh", reliable: true })
   })
   test("goal reads the human objective, including escaped markup", () => {
     const text = templates.goal.replace("${objective}", "请比较这两个选项并完整解释优缺点，保留 &lt;example&gt; 标记。")
-    expect(sourceText(text).text).toContain("<example>")
-    expect(detectInput(text)).toMatchObject({ source: "goal", language: "zh", reliable: true })
+    assert.ok((sourceText(text).text).includes("<example>"))
+    assert.partialDeepStrictEqual(detectInput(text), { source: "goal", language: "zh", reliable: true })
   })
 })

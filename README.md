@@ -26,9 +26,11 @@
 
 ## 本地使用
 
+开发与测试需要 Node.js 26 及 npm；依赖由 `package-lock.json` 锁定。
+
 ```sh
-bun install --frozen-lockfile
-bun run check
+npm ci
+npm run check
 ```
 
 在 OpenCode V2 配置的 `plugins` 数组中添加仓库绝对路径，保留已有插件项：
@@ -43,7 +45,7 @@ bun run check
 
 ## 独立仓库与更新
 
-本项目可作为独立的公开或私有 Git 仓库维护。本地路径安装时，更新仓库后执行 `bun install --frozen-lockfile`、`bun run check`，再重启 OpenCode。
+本项目可作为独立的公开或私有 Git 仓库维护。本地路径安装时，更新仓库后执行 `npm ci`、`npm run check`，再重启 OpenCode。
 
 上传到自己的远程仓库后，可使用 OpenCode 的 Git 包安装方式。以下地址需替换为自己的仓库：
 
@@ -58,11 +60,11 @@ opencode plugin update 'git+ssh://git@github.com/OWNER/opencode-auto-language.gi
 ## 验证
 
 ```sh
-bun run check
+npm run check
 # 以下命令会调用 DeepSeek，产生正常 API 用量
-bun run test:live --smoke
-bun run test:live
-bun run test:live --extended
+npm run test:live -- --smoke
+npm run test:live
+npm run test:live -- --extended
 ```
 
 实测脚本优先读取 `DEEPSEEK_API_KEY`，否则只读本机 OpenCode 数据库中的 DeepSeek 凭据。每个测试使用临时 XDG 目录和独立服务；退出时清理临时配置、数据库、缓存与进程。标准输出含模型测试文本；如重定向到文件，测试后自行删除该输出文件。
