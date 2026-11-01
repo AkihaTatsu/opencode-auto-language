@@ -1,0 +1,34 @@
+{
+  "name": "opencode-auto-language",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Follow the user's language in OpenCode reasoning, replies and native session workflows using offline language detection.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "COMPATIBILITY.md",
+    "NOTICE",
+    "TEST-RESULTS.md"
+  ],
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "tsc --noEmit",
+    "check": "bun run typecheck && bun test",
+    "test:live": "python3 scripts/live_test.py"
+  },
+  "dependencies": {
+    "@opencode/plugin": "2.2.4",
+    "eld": "2.1.0"
+  },
+  "devDependencies": {
+    "@types/bun": "1.4.4",
+    "typescript": "7.0.2"
+  },
+  "engines": {
+    "bun": ">=1.4.4"
+  }
+}
