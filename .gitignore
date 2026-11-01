@@ -2,6 +2,5 @@ node_modules/
 dist/
 coverage/
 *.tgz
-__pycache__/
 .env
 .env.*

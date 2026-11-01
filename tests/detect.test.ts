@@ -1,6 +1,6 @@
 import { describe, test } from "node:test"
 import assert from "node:assert/strict"
-import { detectInput, sourceText, supportedLanguages } from "../src/detect.ts"
+import { detectInput, sourceText } from "../src/detect.ts"
 import templates from "../src/native-templates.json" with { type: "json" }
 
 const samples: Record<string, string> = {
@@ -16,7 +16,6 @@ const samples: Record<string, string> = {
 }
 
 describe("offline detection", () => {
-  test("uses the full detector inventory", () => assert.strictEqual(supportedLanguages.length, 60))
   for (const [language, text] of Object.entries(samples)) {
     test(language, () => {
       assert.partialDeepStrictEqual(detectInput(text), { language, reliable: true, source: "user" })

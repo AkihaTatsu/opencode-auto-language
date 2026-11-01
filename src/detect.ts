@@ -74,5 +74,3 @@ export function detectInput(text: string): Detection {
   const result = eld.detect(value)
   return { language: result.language || undefined, source: source.source, reliable: result.isReliable() }
 }
-
-export const supportedLanguages = Object.values(eld.info().Languages)
