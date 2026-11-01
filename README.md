@@ -16,36 +16,16 @@
 
 ## 安装与更新
 
-本地开发需要 Node.js 26 和 npm：
+安装：
 
 ```sh
-npm ci
-npm run check
+opencode plugin add github:AkihaTatsu/opencode-auto-language
 ```
 
-在 OpenCode V2 配置的 `plugins` 数组中添加仓库绝对路径，保留已有插件项：
-
-```json
-{
-  "plugins": ["/absolute/path/to/opencode-auto-language"]
-}
-```
-
-重启 OpenCode 会话服务以加载插件。更新本地仓库后，重新执行 `npm ci`、`npm run check` 并重启；移除配置项并重启即可停用。
-
-上传到自己的 Git 仓库后，也可使用以下方式安装和更新（替换 `OWNER`）：
+更新：
 
 ```sh
-opencode plugin add 'git+ssh://git@github.com/OWNER/opencode-auto-language.git'
-opencode plugin update 'git+ssh://git@github.com/OWNER/opencode-auto-language.git'
+opencode plugin update github:AkihaTatsu/opencode-auto-language
 ```
 
-私有仓库使用已有 Git 凭据。
-
-## 开发与兼容
-
-`npm test` 执行离线行为测试；`npm run check` 同时执行类型检查和测试。
-
-OpenCode SDK 固定为 2.2.4。升级时需检查插件钩子、原生命令模板及压缩提示的追加顺序，再运行检查。压缩请求支持 Chat Completions / Anthropic 的 `messages` 和 Responses 的数组 `input`；其他格式明确报错。
-
-`src/native-templates.json` 保留上游模板用于提取用户参数，来源和许可见 [NOTICE](NOTICE)。
+安装或更新后重启 OpenCode。
